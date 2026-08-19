@@ -9,6 +9,6 @@ Guilherme Augusto dos Santos.
 -> ODS 9: industra, inovação e infraestrutura
 
 #### Possível stack (A ser discutido)
-linguagem: python.
-framework: fastapi, pytest(para testes unitarios).
-frontend: html, css, js.
+- linguagem: python.
+- framework: fastapi, pytest(para testes unitarios).
+- frontend: html, css, js.
