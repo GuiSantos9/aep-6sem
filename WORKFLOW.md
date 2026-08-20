@@ -1,87 +1,72 @@
-Funcionamento do Sistema
+# 📌 Funcionamento do Sistema
 
-O sistema permite que usuários autenticados cadastrem denúncias, consultem denúncias existentes e abram chamados direcionados a órgãos ou instituições responsáveis.
+O sistema permite que usuários autenticados cadastrem ocorrências, consultem registros existentes e abram chamados para os órgãos ou instituições responsáveis.
 
-🔐 1. Login
+---
 
-Para acessar o sistema, o usuário deve realizar a autenticação:
+### 🔐 1. Autenticação (Login)
 
-Informar o usuário.
-Informar a senha.
-O sistema verifica se o usuário está cadastrado.
-O sistema verifica se a senha informada está correta.
-Caso as informações sejam válidas, o usuário poderá acessar as funcionalidades do sistema.
-📝 2. Cadastrar Denúncia
+Para acessar as funcionalidades, o usuário deve validar suas credenciais:
 
-Após realizar o login, o usuário pode cadastrar uma nova denúncia. Para isso, deverá fornecer:
+1. Inserir **usuário** e **senha**.
+2. O sistema valida o cadastro e a correspondência da senha.
+3. Se os dados forem válidos, o acesso é liberado.
 
-Descrição: informações detalhadas sobre a ocorrência.
-Tipo: categoria à qual a denúncia pertence.
-Endereço: local onde ocorreu a situação denunciada.
-Telefone: número para contato.
-Prioridade: nível de prioridade da denúncia:
-Alta
-Média
-Baixa
+---
 
-Após o preenchimento das informações, a denúncia é registrada no sistema.
+### 📝 2. Cadastro de Denúncias
 
-🔎 3. Exibir Denúncias
+Após o login, uma nova denúncia pode ser registrada preenchendo os seguintes campos:
 
-O sistema permite consultar as denúncias cadastradas.
+| Campo | Descrição |
+| :--- | :--- |
+| **Descrição** | Detalhes completos da ocorrência |
+| **Tipo** | Categoria do registro |
+| **Endereço** | Local exato do ocorrido |
+| **Telefone** | Contato do denunciante/responsável |
+| **Prioridade** | `🔴 Alta` \| `🟡 Média` \| `🟢 Baixa` |
 
-O usuário pode:
+---
 
-Buscar denúncias para localizar registros específicos.
-Ordenar as denúncias por prioridade, seguindo a ordem:
-Alta
-Média
-Baixa
+### 🔎 3. Consulta e Listagem
 
-Essa organização facilita a identificação das denúncias que necessitam de maior atenção.
+O módulo de visualização permite gerenciar as denúncias registradas:
 
-📞 4. Abrir Chamado
+* **Busca direta:** Localização rápida de registros específicos.
+* **Ordenação por prioridade:** Filtro decrescente (`Alta` ➔ `Média` ➔ `Baixa`) para agilizar o atendimento de casos urgentes.
 
-A partir de uma denúncia cadastrada, o usuário pode abrir um chamado para encaminhar a situação ao órgão ou instituição responsável.
+---
 
-O processo consiste em:
+### 📞 4. Abertura de Chamados
 
-Selecionar a denúncia desejada.
-Selecionar o órgão ou instituição responsável pelo atendimento.
-Informar a justificativa para o encaminhamento.
-O chamado é registrado e associado à denúncia selecionada.
-🔄 Fluxo Geral
-LOGIN
-  │
-  ├── Informar usuário
-  ├── Informar senha
-  ├── Confirmar usuário cadastrado
-  └── Verificar senha correta
-          │
-          ▼
-CADASTRAR DENÚNCIA
-  │
-  ├── Informar descrição
-  ├── Selecionar tipo
-  ├── Informar endereço
-  ├── Informar telefone
-  └── Selecionar prioridade
-          │
-          ▼
-EXIBIR DENÚNCIAS
-  │
-  ├── Buscar denúncias
-  └── Ordenar por prioridade
-          │
-          ▼
-ABRIR CHAMADO
-  │
-  ├── Selecionar denúncia
-  ├── Selecionar órgão/instituição
-  └── Informar justificativa
+Permite encaminhar uma denúncia ativa para a entidade competente:
 
-🧩 Resumo do Funcionamento
+1. **Selecionar a denúncia** desejada na listagem.
+2. **Escolher o órgão/instituição** responsável pelo atendimento.
+3. **Inserir a justificativa** técnica do encaminhamento.
+4. **Confirmar:** O chamado é gerado e vinculado diretamente à denúncia.
 
-O fluxo do sistema começa pela autenticação do usuário. Após o login, é possível cadastrar novas denúncias informando seus dados e definindo o nível de prioridade.
+---
 
-As denúncias cadastradas ficam disponíveis para consulta e ordenação por prioridade. Quando necessário, uma denúncia pode ser selecionada para a abertura de um chamado, no qual o usuário define o órgão ou instituição responsável e informa a justificativa para o encaminhamento.
+### 🔄 Fluxo Operacional
+
+```text
+[ LOGIN ]
+   ├── Informar usuário e senha
+   └── Validação de credenciais
+           │
+           ▼
+[ CADASTRAR DENÚNCIA ]
+   ├── Dados: Descrição, Tipo, Endereço, Telefone
+   └── Definir Prioridade (Alta / Média / Baixa)
+           │
+           ▼
+[ EXIBIR DENÚNCIAS ]
+   ├── Buscar registros
+   └── Ordenar por nível de prioridade
+           │
+           ▼
+[ ABRIR CHAMADO ]
+   ├── Selecionar denúncia
+   ├── Vincular órgão/instituição
+   └── Adicionar justificativa
