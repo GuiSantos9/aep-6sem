@@ -22,8 +22,7 @@ Siga o passo a passo abaixo para configurar o ambiente e executar a API.
 
 ### 1. Clonar o Repositório
 ```bash
-git clone <URL_DO_SEU_REPOSITORIO>
-cd <NOME_DA_PASTA>
+git clone <https://github.com/GuiSantos9/aep-6sem.git>
 ``` 
 
 ### 2. Criar e ativar o ambiente virtual
