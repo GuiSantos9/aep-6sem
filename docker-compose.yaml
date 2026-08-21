@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  # Serviço da sua aplicação
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGO_URI=mongodb://root:senha123@mongodb:27017/meubanco?authSource=admin
+    depends_on:
+      - mongodb
+
+  # Serviço do MongoDB
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: senha123
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
