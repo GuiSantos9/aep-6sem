@@ -1,26 +1,25 @@
-version: '3.8'
-
 services:
-  # Serviço da sua aplicação
   app:
     build: .
     ports:
       - "8000:8000"
     environment:
-      - MONGO_URI=mongodb://root:senha123@mongodb:27017/meubanco?authSource=admin
+      MONGO_URI: mongodb://${MONGO_USER}:${MONGO_PASSWORD}@mongodb:27017/meubanco?authSource=admin
     depends_on:
       - mongodb
 
-  # Serviço do MongoDB
   mongodb:
-    image: mongo:latest
-    ports:
-      - "27017:27017"
+    image: mongo:8
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: senha123
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
     volumes:
       - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   mongo_data:
