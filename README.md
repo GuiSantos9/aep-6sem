@@ -14,7 +14,7 @@
 - frontend: html, css, js.
 
 #### Estrutura de pastas
-
+``` shell
 projeto-denuncias/
 ├── app/
 │   ├── __init__.py
@@ -70,7 +70,7 @@ projeto-denuncias/
 ├── .gitignore
 ├── requirements.txt (ou pyproject.toml)
 └── README.md
-
+```
 # 🚀 Como Executar o Projeto Localmente
 
 Siga o passo a passo abaixo para configurar o ambiente e executar a API.
