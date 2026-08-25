@@ -50,6 +50,7 @@ JavaScript
 Matheus Pintor Fernandes Ferreira
 Guilherme Augusto dos Santos
 📂 Estrutura do Projeto
+``` shell
 projeto-denuncias/
 ├── app/
 │   ├── __init__.py
@@ -105,7 +106,7 @@ projeto-denuncias/
 ├── .gitignore
 ├── requirements.txt             # Dependências do projeto
 └── README.md
-
+```
 🚀 Como Executar o Projeto Localmente
 
 Siga os passos abaixo para configurar o ambiente de desenvolvimento e executar a API.
