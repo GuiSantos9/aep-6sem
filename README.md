@@ -1,82 +1,114 @@
-# ***Repositorio feito para a AEP do 6 semestre***
+🏙️ Inóspita
 
-#### ***Alunos***
-- Matheus Pintor Fernandes Ferreira.
-- Guilherme Augusto dos Santos.
+Plataforma de gerenciamento de denúncias de arquitetura hostil
 
+O Inóspita é uma plataforma desenvolvida como projeto da AEP do 6º semestre, com o objetivo de possibilitar o registro, gerenciamento e acompanhamento de denúncias relacionadas à arquitetura hostil nos espaços urbanos.
 
-#### Temas da a serem debatidos
--> ODS 9: industra, inovação e infraestrutura
+A proposta busca utilizar a tecnologia como ferramenta de apoio à identificação de situações que dificultam ou impedem a permanência e a circulação de pessoas em determinados espaços públicos.
 
-#### Possível stack (A ser discutido)
-- linguagem: python.
-- framework: fastapi, pytest(para testes unitarios).
-- frontend: html, css, js.
+🎯 Objetivo
 
-#### Estrutura de pastas
-``` shell
+Desenvolver uma plataforma capaz de:
+
+📍 Registrar denúncias relacionadas à arquitetura hostil;
+📝 Armazenar informações e evidências das ocorrências;
+🔎 Permitir a consulta e filtragem de denúncias;
+🚨 Classificar ocorrências de acordo com sua prioridade;
+🏛️ Vincular denúncias a órgãos ou instituições responsáveis;
+📊 Facilitar o acompanhamento e gerenciamento dos chamados;
+🌎 Contribuir para a discussão sobre espaços urbanos mais acessíveis e inclusivos.
+🌱 ODS relacionado
+
+O projeto está relacionado ao:
+
+ODS 9 — Indústria, Inovação e Infraestrutura
+
+Construir infraestruturas resilientes, promover a industrialização inclusiva e sustentável e fomentar a inovação.
+
+A utilização de tecnologia para registrar e organizar informações sobre problemas presentes no espaço urbano está alinhada à proposta de utilizar inovação e infraestrutura tecnológica como ferramentas para a melhoria da sociedade.
+
+🛠️ Tecnologias
+Backend
+<p align="left"> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" width="45" alt="Python"/> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg" width="45" alt="FastAPI"/> </p>
+Python — linguagem principal;
+FastAPI — desenvolvimento da API REST;
+Pytest — testes automatizados e testes unitários.
+Banco de dados
+<p align="left"> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg" width="45" alt="MongoDB"/> </p>
+MongoDB — armazenamento dos dados da aplicação.
+Infraestrutura
+<p align="left"> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" width="45" alt="Docker"/> </p>
+Docker — containerização da aplicação (em implementação).
+Frontend
+HTML
+CSS
+JavaScript
+
+🚧 O frontend e a infraestrutura com Docker estão em desenvolvimento.
+
+👨‍💻 Desenvolvedores
+Matheus Pintor Fernandes Ferreira
+Guilherme Augusto dos Santos
+📂 Estrutura do Projeto
 projeto-denuncias/
 ├── app/
 │   ├── __init__.py
-│   ├── main.py                  # Ponto de entrada FastAPI e inclusão de routers
+│   ├── main.py                  # Ponto de entrada da aplicação FastAPI
+│   │
 │   ├── core/                    # Configurações globais e segurança
 │   │   ├── __init__.py
-│   │   ├── config.py            # Variáveis de ambiente (Pydantic BaseSettings)
-│   │   ├── security.py          # Hashing de senhas, JWT e OAuth2
-│   │   └── database.py          # Conexão e sessão do banco de dados (ex: SQLAlchemy)
+│   │   ├── config.py            # Variáveis de ambiente
+│   │   ├── security.py          # Hashing, JWT e OAuth2
+│   │   └── database.py          # Conexão com o MongoDB
 │   │
 │   ├── api/                     # Camada de endpoints/rotas
 │   │   ├── __init__.py
-│   │   ├── deps.py              # Injeção de dependências (get_db, get_current_user)
+│   │   ├── deps.py              # Injeção de dependências
 │   │   └── v1/
 │   │       ├── __init__.py
-│   │       ├── api.py           # Agrupador de rotas da v1
+│   │       ├── api.py           # Agrupador de rotas da API v1
 │   │       └── endpoints/
 │   │           ├── __init__.py
-│   │           ├── auth.py      # /login e autenticação
-│   │           ├── denuncias.py # /denuncias (CRUD, filtros, ordenação por prioridade)
-│   │           └── chamados.py  # /chamados (vincular órgão e justificativa)
+│   │           ├── auth.py      # Autenticação
+│   │           ├── denuncias.py # CRUD e filtros de denúncias
+│   │           └── chamados.py  # Gerenciamento de chamados
 │   │
-│   ├── models/                  # Entidades do Banco de Dados (ORM)
+│   ├── models/                  # Modelos das entidades
 │   │   ├── __init__.py
-│   │   ├── user.py              # Tabela de Usuários
-│   │   ├── denuncia.py          # Tabela de Denúncias
-│   │   ├── chamado.py           # Tabela de Chamados
-│   │   └── orgao.py             # Tabela de Órgãos/Instituições
+│   │   ├── user.py              # Usuários
+│   │   ├── denuncia.py          # Denúncias
+│   │   ├── chamado.py           # Chamados
+│   │   └── orgao.py             # Órgãos e instituições
 │   │
-│   ├── schemas/                 # Validação de dados de entrada/saída (Pydantic)
+│   ├── schemas/                 # Validação de dados com Pydantic
 │   │   ├── __init__.py
-│   │   ├── token.py             # Schemas de Token JWT
-│   │   ├── user.py              # UserCreate, UserResponse
-│   │   ├── denuncia.py          # DenunciaCreate, DenunciaResponse, DenunciaFilter
-│   │   ├── chamado.py           # ChamadoCreate, ChamadoResponse
-│   │   └── enums.py             # Enums (PrioridadeEnum: ALTA, MEDIA, BAIXA)
+│   │   ├── token.py             # Schemas de autenticação
+│   │   ├── user.py              # Dados de usuários
+│   │   ├── denuncia.py          # Dados de denúncias
+│   │   ├── chamado.py           # Dados de chamados
+│   │   └── enums.py              # Enumerações de prioridade
 │   │
-│   └── services/                # Regras de negócio e lógica de aplicação
+│   └── services/                # Regras de negócio
 │       ├── __init__.py
-│       ├── auth_service.py      # Lógica de validação de credenciais
-│       ├── denuncia_service.py  # Criação, busca e ordenação de ocorrências
-│       └── chamado_service.py   # Regra de vínculo denúncia-órgão e justificativa
+│       ├── auth_service.py      # Autenticação
+│       ├── denuncia_service.py  # Gerenciamento de denúncias
+│       └── chamado_service.py   # Gerenciamento de chamados
 │
-├── tests/                       # Estrutura de Testes com Pytest
+├── tests/                       # Testes automatizados
 │   ├── __init__.py
-│   ├── conftest.py              # Fixtures globais (cliente de teste, banco em memória, auth token)
-│   ├── test_auth.py             # Testes de login e geração de token
-│   ├── test_denuncias.py        # Testes de cadastro, busca e ordenação por prioridade
-│   └── test_chamados.py         # Testes de abertura e validação de chamados
+│   ├── conftest.py              # Fixtures globais
+│   ├── test_auth.py             # Testes de autenticação
+│   ├── test_denuncias.py        # Testes de denúncias
+│   └── test_chamados.py         # Testes de chamados
 │
-├── alembic/                     # Migrações de banco de dados (se aplicável)
-├── .env.example
+├── .env.example                 # Exemplo de variáveis de ambiente
 ├── .gitignore
-├── requirements.txt (ou pyproject.toml)
+├── requirements.txt             # Dependências do projeto
 └── README.md
-```
-# 🚀 Como Executar o Projeto Localmente
 
-Siga o passo a passo abaixo para configurar o ambiente e executar a API.
+🚀 Como Executar o Projeto Localmente
 
-## 📋 Pré-requisitos
-* Python **3.12.8** instalado ([python.org](https://www.python.org/downloads/release/python-3128/))
+Siga os passos abaixo para configurar o ambiente de desenvolvimento e executar a API.
 
 ### 1. Clonar o Repositório
 ```bash
