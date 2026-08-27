@@ -1,12 +1,11 @@
-# Ambientes virtuais
-venv/
-.venv/
-env/
-
-# Bytecode e caches do Python
 __pycache__/
 *.py[cod]
-*$py.class
-
-# Arquivos de variáveis de ambiente
+*.db
 .env
+.venv/
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/

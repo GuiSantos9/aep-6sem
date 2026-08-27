@@ -1,22 +1,56 @@
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from os import environ
-from fastapi import FastAPI
+from pathlib import Path
+
 from dotenv import dotenv_values
+from fastapi import FastAPI, Request
 from pymongo import MongoClient
-
-# Lê a URL configurada no docker-compose.yml
-mongo_uri = environ["MONGO_URI"]
-
-config = dotenv_values(".env")
-app = FastAPI()
+from pymongo.database import Database
 
 
-@app.on_event("startup")
-def iniciar_cliente_db():
-    app.mongodb_client = MongoClient(mongo_uri)
-    app.database = app.mongodb_client[config["DB_NAME"]]
-    print("Connected to the MongoDB database!")
+BASE_DIR = Path(__file__).resolve().parent.parent
+ENV_PATH = BASE_DIR / ".env"
+
+config = dotenv_values(ENV_PATH)
 
 
-@app.on_event("shutdown")
-def finalizar_cliente_db():
-    app.mongodb_client.close()
+def obter_configuracao(nome: str) -> str:
+    valor = environ.get(nome) or config.get(nome)
+
+    if not valor:
+        raise RuntimeError(
+            f"A variável {nome} precisa estar configurada "
+            "no ambiente ou no arquivo .env."
+        )
+
+    return valor
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    mongo_uri = obter_configuracao("MONGO_URI")
+    db_name = obter_configuracao("DB_NAME")
+
+    client = MongoClient(
+        mongo_uri,
+        serverSelectionTimeoutMS=5000,
+    )
+
+    # Verifica se o MongoDB realmente está acessível
+    client.admin.command("ping")
+
+    app.state.mongodb_client = client
+    app.state.database = client[db_name]
+
+    print("Conectado ao MongoDB!")
+
+    try:
+        yield
+    finally:
+        client.close()
+        print("Conexão com MongoDB encerrada.")
+
+
+def get_database(request: Request) -> Database:
+    return request.app.state.database

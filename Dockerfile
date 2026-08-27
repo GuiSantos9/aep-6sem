@@ -8,10 +8,14 @@ WORKDIR /app
 COPY requirements.txt .
 
 # Instalação de dependências quando criar a imagem
-RUN pip install --no-cache-dir -r requirements.txt
+RUN python - m pip install --no-cache-dir.
 
 # Diretório de trabalho (atual)
-COPY . .
+COPY pyproject.toml README.md ./
+COPY app ./app
+COPY db ./db
+
+EXPOSE 8000
 
 # Início execução
-CMD ["python", "main.py"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

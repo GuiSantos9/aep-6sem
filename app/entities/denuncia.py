@@ -1,22 +1,26 @@
-from enums.tipo import TipoEnum
-from enums.prioridade import PrioridadeEnum
-from .vinculo import VinculoEntity
-from pydantic import BaseModel
+from datetime import datetime
+from typing import NotRequired, TypedDict
+
+from bson import ObjectId
 
 
-class DenunciaRequestEntity(BaseModel):
+class DenunciaModel(TypedDict):
+    _id: NotRequired[ObjectId]
+    titulo: str
     descricao: str
-    tipo: TipoEnum
-    endereco: str
-    telefone: str
-    prioridade: PrioridadeEnum
+    tipo: str
+    prioridade: str
+    status: str
+    logradouro: str
+    numero: str | None
+    complemento: str | None
+    bairro: str
+    cidade: str
+    uf: str
+    cep: str | None
+    latitude: float | None
+    longitude: float | None
+    evidencias: list[str]
+    criado_em: datetime
+    atualizado_em: datetime
 
-
-class DenunciaResponseEntity(DenunciaRequestEntity):
-    id: int
-    descricao: str
-    tipo: TipoEnum
-    endereco: str
-    telefone: str
-    prioridade: PrioridadeEnum
-    vinculo: VinculoEntity | None
