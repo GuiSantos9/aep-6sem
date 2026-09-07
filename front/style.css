@@ -2,20 +2,20 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --green:        #1a56db;
-  --green-mid:    #1d4ed8;
-  --green-light:  #3b82f6;
-  --green-pale:   #dbeafe;
-  --green-tint:   #eff6ff;
+  --primary:      #4F46E5;
+  --primary-mid:  #4338CA;
+  --primary-light:#6366F1;
+  --primary-pale: #E0E7FF;
+  --primary-tint: #EEF2FF;
 
-  --bg:           #ffffff;
-  --surface:      #f8f9f8;
-  --border:       #e2e8e4;
-  --border-mid:   #c8d5cc;
+  --bg:           #EBEBEB;
+  --surface:      #FFFFFF;
+  --border:       #D9D9D9;
+  --border-mid:   #BFBFBF;
 
-  --text:         #1a2e22;
-  --text-mid:     #4a6358;
-  --text-muted:   #8aab97;
+  --text:         #1a1a2e;
+  --text-mid:     #4a4a6a;
+  --text-muted:   #9ca3af;
 
   --danger:       #dc2626;
   --danger-bg:    #fef2f2;
@@ -34,10 +34,10 @@
   --status-resolvida:   #16a34a;
   --status-arquivada:   #9ca3af;
 
-  --radius:    6px;
-  --radius-lg: 10px;
+  --radius:    8px;
+  --radius-lg: 12px;
   --shadow-sm: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.05);
-  --shadow:    0 4px 16px rgba(0,0,0,.1);
+  --shadow:    0 4px 16px rgba(0,0,0,.12);
   --transition: .15s ease;
 }
 
@@ -54,7 +54,7 @@ body {
 
 /* ── Header ─────────────────────────────────────────── */
 .header {
-  background: var(--green);
+  background: var(--primary);
   padding: 0 2rem;
   height: 60px;
   display: flex;
@@ -132,7 +132,7 @@ body {
 
 /* ── Controls ────────────────────────────────────────── */
 .input, .select {
-  background: var(--bg);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   color: var(--text);
@@ -143,8 +143,8 @@ body {
   transition: border-color var(--transition), box-shadow var(--transition);
 }
 .input:focus, .select:focus {
-  border-color: var(--green-light);
-  box-shadow: 0 0 0 3px rgba(59,130,246,.15);
+  border-color: var(--primary-light);
+  box-shadow: 0 0 0 3px rgba(99,102,241,.18);
 }
 .input::placeholder { color: var(--text-muted); }
 .textarea { resize: vertical; min-height: 80px; }
@@ -169,14 +169,14 @@ option { background: #fff; color: var(--text); }
 .btn:disabled { opacity: .45; cursor: not-allowed; }
 
 .btn-primary {
-  background: var(--green);
+  background: var(--primary);
   color: #fff;
-  border-color: var(--green);
+  border-color: var(--primary);
 }
-.btn-primary:hover:not(:disabled) { background: var(--green-mid); border-color: var(--green-mid); }
+.btn-primary:hover:not(:disabled) { background: var(--primary-mid); border-color: var(--primary-mid); }
 
 .btn-secondary {
-  background: var(--bg);
+  background: var(--surface);
   color: var(--text-mid);
   border-color: var(--border);
 }
@@ -187,7 +187,7 @@ option { background: #fff; color: var(--text); }
   color: var(--text-muted);
   border-color: transparent;
 }
-.btn-ghost:hover:not(:disabled) { background: var(--surface); color: var(--text-mid); }
+.btn-ghost:hover:not(:disabled) { background: var(--bg); color: var(--text-mid); }
 
 .btn-danger {
   background: var(--danger);
@@ -196,19 +196,19 @@ option { background: #fff; color: var(--text); }
 }
 .btn-danger:hover:not(:disabled) { background: #b91c1c; }
 
+/* ── Icon buttons (edit / delete) ────────────────────── */
 .btn-icon {
-  padding: .35rem;
+  padding: .3rem;
   border-radius: var(--radius);
   border: none;
   cursor: pointer;
   background: transparent;
-  color: var(--text-muted);
+  color: #c0c0c0;
   font-size: .95rem;
-  transition: background var(--transition), color var(--transition);
+  transition: color var(--transition);
   line-height: 1;
 }
-.btn-icon:hover { background: var(--surface); color: var(--text); }
-.btn-icon.btn-icon-danger:hover { color: var(--danger); }
+.btn-icon:hover { background: transparent; color: var(--primary); }
 
 /* ── Cards ───────────────────────────────────────────── */
 .denuncia-grid {
@@ -218,7 +218,7 @@ option { background: #fff; color: var(--text); }
 }
 
 .card {
-  background: var(--bg);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 1rem 1.1rem;
@@ -229,7 +229,7 @@ option { background: #fff; color: var(--text); }
   transition: border-color var(--transition), box-shadow var(--transition);
 }
 .card:hover {
-  border-color: var(--green-light);
+  border-color: var(--primary-light);
   box-shadow: var(--shadow-sm);
 }
 
@@ -315,8 +315,8 @@ option { background: #fff; color: var(--text); }
 .badge-arquivada   { color: var(--status-arquivada);   background: #f9fafb; }
 
 .badge-tipo {
-  color: var(--green);
-  background: var(--green-tint);
+  color: var(--primary);
+  background: var(--primary-tint);
 }
 
 /* ── Paginação ───────────────────────────────────────── */
@@ -354,7 +354,7 @@ option { background: #fff; color: var(--text); }
   width: 28px;
   height: 28px;
   border: 2px solid var(--border);
-  border-top-color: var(--green);
+  border-top-color: var(--primary);
   border-radius: 50%;
   animation: spin .7s linear infinite;
 }
@@ -375,7 +375,7 @@ option { background: #fff; color: var(--text); }
 @keyframes fade-in { from { opacity: 0; } }
 
 .modal {
-  background: var(--bg);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   width: 100%;
@@ -411,7 +411,7 @@ option { background: #fff; color: var(--text); }
   transition: background var(--transition);
   line-height: 1;
 }
-.modal-close:hover { background: var(--surface); }
+.modal-close:hover { background: var(--bg); }
 
 .modal-body {
   padding: 1.2rem 1.3rem;
@@ -477,7 +477,7 @@ option { background: #fff; color: var(--text); }
   white-space: nowrap;
 }
 @keyframes toast-in { from { opacity: 0; transform: translateX(-50%) translateY(10px); } }
-.toast.toast-ok    { background: var(--green); }
+.toast.toast-ok    { background: var(--primary); }
 .toast.toast-error { background: var(--danger); }
 
 /* ── Utils ───────────────────────────────────────────── */
