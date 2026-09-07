@@ -354,9 +354,11 @@ document.getElementById('btn-cancel').addEventListener('click', closeModal);
 document.getElementById('modal-close').addEventListener('click', closeModal);
 document.getElementById('denuncia-form').addEventListener('submit', handleFormSubmit);
 
-document.getElementById('btn-buscar').addEventListener('click', () => {
-  state.tipo       = document.getElementById('filter-tipo').value;
-  state.prioridade = document.getElementById('filter-prioridade').value;
+document.getElementById('btn-limpar').addEventListener('click', () => {
+  document.getElementById('filter-tipo').value = '';
+  document.getElementById('filter-prioridade').value = '';
+  state.tipo       = '';
+  state.prioridade = '';
   state.page = 0;
   loadList();
 });
