@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inóspita — Denúncias</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ── HEADER ── -->
+  <header class="header">
+    <div class="header-brand">
+      <span class="header-icon" aria-hidden="true">🏙️</span>
+      <div>
+        <h1 class="header-title">Inóspita</h1>
+        <p class="header-sub">Arquitetura Hostil Urbana</p>
+      </div>
+    </div>
+    <div id="health-badge" class="health-badge health-checking">⬤ verificando...</div>
+  </header>
+
+  <!-- ── MAIN ── -->
+  <main class="main">
+
+    <!-- toolbar -->
+    <div class="toolbar">
+      <div class="filters">
+        <select id="filter-tipo" class="select">
+          <option value="">Todos os tipos</option>
+          <option value="banco_dividido">Banco Dividido</option>
+          <option value="espigao_metalico">Espigão Metálico</option>
+          <option value="inclinacao_de_superficie">Inclinação de Superfície</option>
+          <option value="retirada_de_assento">Retirada de Assento</option>
+          <option value="barreira_fisica">Barreira Física</option>
+          <option value="emissao_sonora">Emissão Sonora</option>
+          <option value="aspersor_de_agua">Aspersor de Água</option>
+          <option value="outro">Outro</option>
+        </select>
+        <select id="filter-prioridade" class="select">
+          <option value="">Todas as prioridades</option>
+          <option value="baixa">Baixa</option>
+          <option value="media">Média</option>
+          <option value="alta">Alta</option>
+          <option value="urgente">Urgente</option>
+        </select>
+        <button id="btn-buscar" class="btn btn-secondary">🔍 Buscar</button>
+      </div>
+      <button id="btn-nova" class="btn btn-primary">+ Nova Denúncia</button>
+    </div>
+
+    <!-- summary -->
+    <p id="list-summary" class="list-summary"></p>
+
+    <!-- loading -->
+    <div id="loading" class="loading hidden">
+      <div class="spinner"></div>
+      <p>Carregando...</p>
+    </div>
+
+    <!-- grid -->
+    <div id="denuncia-grid" class="denuncia-grid"></div>
+
+    <!-- empty state -->
+    <div id="empty-state" class="empty-state hidden">
+      <span>📭</span>
+      <p>Nenhuma denúncia encontrada para os filtros selecionados.</p>
+    </div>
+
+    <!-- pagination -->
+    <nav id="pagination" class="pagination hidden" aria-label="Paginação"></nav>
+
+  </main>
+
+  <!-- ── MODAL DENÚNCIA ── -->
+  <div id="modal-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modal-title">Nova Denúncia</h2>
+        <button id="modal-close" class="modal-close" aria-label="Fechar">✕</button>
+      </div>
+
+      <form id="denuncia-form" novalidate>
+        <div class="modal-body">
+          <div class="form-grid">
+
+            <!-- título -->
+            <div class="form-group col-full">
+              <label for="f-titulo">Título *</label>
+              <input id="f-titulo" type="text" name="titulo" class="input"
+                     minlength="5" maxlength="120" required
+                     placeholder="Ex.: Banco com divisória no centro">
+            </div>
+
+            <!-- tipo + prioridade -->
+            <div class="form-group">
+              <label for="f-tipo">Tipo *</label>
+              <select id="f-tipo" name="tipo" class="select" required>
+                <option value="">Selecione...</option>
+                <option value="banco_dividido">Banco Dividido</option>
+                <option value="espigao_metalico">Espigão Metálico</option>
+                <option value="inclinacao_de_superficie">Inclinação de Superfície</option>
+                <option value="retirada_de_assento">Retirada de Assento</option>
+                <option value="barreira_fisica">Barreira Física</option>
+                <option value="emissao_sonora">Emissão Sonora</option>
+                <option value="aspersor_de_agua">Aspersor de Água</option>
+                <option value="outro">Outro</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="f-prioridade">Prioridade</label>
+              <select id="f-prioridade" name="prioridade" class="select">
+                <option value="baixa">Baixa</option>
+                <option value="media" selected>Média</option>
+                <option value="alta">Alta</option>
+                <option value="urgente">Urgente</option>
+              </select>
+            </div>
+
+            <!-- status (só no modo edição) -->
+            <div class="form-group" id="status-group" style="display:none">
+              <label for="f-status">Status</label>
+              <select id="f-status" name="status" class="select">
+                <option value="registrada">Registrada</option>
+                <option value="em_analise">Em Análise</option>
+                <option value="encaminhada">Encaminhada</option>
+                <option value="resolvida">Resolvida</option>
+                <option value="arquivada">Arquivada</option>
+              </select>
+            </div>
+
+            <!-- descrição -->
+            <div class="form-group col-full">
+              <label for="f-descricao">Descrição *</label>
+              <textarea id="f-descricao" name="descricao" class="input textarea"
+                        minlength="10" maxlength="5000" rows="4" required
+                        placeholder="Descreva a ocorrência em detalhes..."></textarea>
+            </div>
+
+            <!-- endereço -->
+            <div class="form-group col-2">
+              <label for="f-logradouro">Logradouro *</label>
+              <input id="f-logradouro" type="text" name="logradouro" class="input"
+                     required placeholder="Rua, Av., Praça...">
+            </div>
+            <div class="form-group col-1">
+              <label for="f-numero">Número</label>
+              <input id="f-numero" type="text" name="numero" class="input"
+                     maxlength="20" placeholder="s/n">
+            </div>
+
+            <div class="form-group col-full">
+              <label for="f-complemento">Complemento</label>
+              <input id="f-complemento" type="text" name="complemento" class="input"
+                     maxlength="100" placeholder="Bloco, Lote...">
+            </div>
+
+            <div class="form-group">
+              <label for="f-bairro">Bairro *</label>
+              <input id="f-bairro" type="text" name="bairro" class="input" required>
+            </div>
+            <div class="form-group">
+              <label for="f-cidade">Cidade *</label>
+              <input id="f-cidade" type="text" name="cidade" class="input" required>
+            </div>
+            <div class="form-group col-1">
+              <label for="f-uf">UF *</label>
+              <input id="f-uf" type="text" name="uf" class="input"
+                     maxlength="2" required placeholder="PR">
+            </div>
+            <div class="form-group col-1">
+              <label for="f-cep">CEP</label>
+              <input id="f-cep" type="text" name="cep" class="input"
+                     placeholder="00000-000">
+            </div>
+
+            <!-- evidências -->
+            <div class="form-group col-full">
+              <label for="f-evidencias">Evidências <span class="label-hint">(URLs, uma por linha)</span></label>
+              <textarea id="f-evidencias" name="evidencias" class="input textarea" rows="3"
+                        placeholder="https://example.com/foto.jpg"></textarea>
+            </div>
+
+          </div>
+
+          <p id="form-error" class="form-error hidden"></p>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="btn-cancel" class="btn btn-ghost">Cancelar</button>
+          <button type="submit" id="btn-submit" class="btn btn-primary">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── MODAL CONFIRMAÇÃO EXCLUSÃO ── -->
+  <div id="confirm-overlay" class="modal-overlay hidden" role="alertdialog" aria-modal="true">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <h2>Confirmar exclusão</h2>
+      </div>
+      <div class="modal-body">
+        <p>Tem certeza que deseja excluir esta denúncia? A ação não pode ser desfeita.</p>
+      </div>
+      <div class="modal-footer">
+        <button id="confirm-cancel" class="btn btn-ghost">Cancelar</button>
+        <button id="confirm-delete" class="btn btn-danger">Excluir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TOAST ── -->
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
