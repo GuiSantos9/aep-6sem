@@ -8,6 +8,8 @@ from fastapi import FastAPI, Request
 from pymongo import DESCENDING, MongoClient
 from pymongo.database import Database
 
+from db.seed import seed_denuncias
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 ENV_PATH = BASE_DIR / ".env"
 
@@ -46,6 +48,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.database = client[db_name]
 
     criar_indices(app.state.database)
+    seed_denuncias(app.state.database)
 
     print("Conectado ao MongoDB!")
 
