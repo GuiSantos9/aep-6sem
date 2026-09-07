@@ -12,14 +12,13 @@ from pydantic import (
 
 from app.enums.prioridade import PrioridadeEnum
 from app.enums.status import StatusDenuncia
-from app.enums.tipo import TipoArquiteturaHostil
-from app.schemas.vinculo import VinculoResponse
+from app.enums.tipo import TipoEnum
 
 
 class DenunciaBase(BaseModel):
     titulo: str = Field(min_length=5, max_length=120)
     descricao: str = Field(min_length=10, max_length=5000)
-    tipo: TipoArquiteturaHostil
+    tipo: TipoEnum
     prioridade: PrioridadeEnum = PrioridadeEnum.MEDIA
     logradouro: str = Field(min_length=3, max_length=160)
     numero: str | None = Field(default=None, max_length=20)
@@ -28,8 +27,6 @@ class DenunciaBase(BaseModel):
     cidade: str = Field(min_length=2, max_length=100)
     uf: str = Field(min_length=2, max_length=2)
     cep: str | None = Field(default=None, pattern=r"^\d{5}-?\d{3}$")
-    latitude: float | None = Field(default=None, ge=-90, le=90)
-    longitude: float | None = Field(default=None, ge=-180, le=180)
     evidencias: list[HttpUrl] = Field(default_factory=list, max_length=10)
 
     @field_validator("uf")
@@ -53,7 +50,7 @@ class DenunciaCreate(DenunciaBase):
 class DenunciaUpdate(BaseModel):
     titulo: str | None = Field(default=None, min_length=5, max_length=120)
     descricao: str | None = Field(default=None, min_length=10, max_length=5000)
-    tipo: TipoArquiteturaHostil | None = None
+    tipo: TipoEnum | None = None
     prioridade: PrioridadeEnum | None = None
     status: StatusDenuncia | None = None
     logradouro: str | None = Field(default=None, min_length=3, max_length=160)
@@ -63,8 +60,6 @@ class DenunciaUpdate(BaseModel):
     cidade: str | None = Field(default=None, min_length=2, max_length=100)
     uf: str | None = Field(default=None, min_length=2, max_length=2)
     cep: str | None = Field(default=None, pattern=r"^\d{5}-?\d{3}$")
-    latitude: float | None = Field(default=None, ge=-90, le=90)
-    longitude: float | None = Field(default=None, ge=-180, le=180)
     evidencias: list[HttpUrl] | None = Field(default=None, max_length=10)
 
     @field_validator("uf")
@@ -117,7 +112,7 @@ class DenunciaResponse(BaseModel):
     id: str = Field(validation_alias=AliasChoices("_id", "id"))
     titulo: str
     descricao: str
-    tipo: TipoArquiteturaHostil
+    tipo: TipoEnum
     prioridade: PrioridadeEnum
     status: StatusDenuncia
     logradouro: str
@@ -127,12 +122,8 @@ class DenunciaResponse(BaseModel):
     cidade: str
     uf: str
     cep: str | None
-    latitude: float | None
-    longitude: float | None
     evidencias: list[HttpUrl]
     criado_em: datetime
-    atualizado_em: datetime
-    vinculos: list[VinculoResponse] = Field(default_factory=list)
 
     @field_validator("id", mode="before")
     @classmethod
