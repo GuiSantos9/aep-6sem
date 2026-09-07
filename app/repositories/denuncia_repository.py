@@ -1,5 +1,4 @@
 from datetime import datetime, timezone
-from re import escape
 from typing import Any
 
 from bson import ObjectId
@@ -42,8 +41,6 @@ class DenunciaRepository:
         *,
         tipo: TipoEnum | None = None,
         prioridade: PrioridadeEnum | None = None,
-        endereco: str | None = None,
-        orgao_nome: str | None = None,
         limit: int = 20,
         offset: int = 0,
     ) -> tuple[list[DenunciaModel], int]:
@@ -53,19 +50,6 @@ class DenunciaRepository:
             query["tipo"] = tipo.value
         if prioridade:
             query["prioridade"] = prioridade.value
-        if endereco:
-            query["endereco"] = endereco
-        if orgao_nome:
-            vinculos = self.collection.find(
-                {
-                    "vinculos.orgao_nome": {
-                        "$regex": escape(orgao_nome),
-                        "$options": "i",
-                    }
-                },
-                {"_id": 1},
-            )
-            query["_id"] = {"$in": [item["_id"] for item in vinculos]}
 
         total = self.collection.count_documents(query)
         cursor = (

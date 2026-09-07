@@ -43,17 +43,6 @@ def test_crud_de_denuncia(client):
     assert client.get(f"/denuncias/{denuncia_id}").status_code == 404
 
 
-def test_nao_encaminha_sem_vinculo(client):
-    denuncia_id = criar_denuncia(client)["id"]
-
-    response = client.patch(
-        f"/denuncias/{denuncia_id}",
-        json={"status": "encaminhada"},
-    )
-    assert response.status_code == 422
-    assert "vínculo" in response.json()["detail"]
-
-
 def test_object_id_invalido_retorna_404(client):
     response = client.get("/denuncias/id-invalido")
     assert response.status_code == 404

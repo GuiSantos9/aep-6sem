@@ -13,7 +13,6 @@ from pydantic import (
 from app.enums.prioridade import PrioridadeEnum
 from app.enums.status import StatusDenuncia
 from app.enums.tipo import TipoEnum
-from app.schemas.vinculo import VinculoResponse
 
 
 class DenunciaBase(BaseModel):
@@ -125,7 +124,6 @@ class DenunciaResponse(BaseModel):
     cep: str | None
     evidencias: list[HttpUrl]
     criado_em: datetime
-    vinculos: list[VinculoResponse] = Field(default_factory=list)
 
     @field_validator("id", mode="before")
     @classmethod

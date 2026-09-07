@@ -36,14 +36,12 @@ def list_denuncias(
     service: Annotated[DenunciaService, Depends(get_denuncia_service)],
     tipo: TipoEnum | None = None,
     prioridade: PrioridadeEnum | None = None,
-    orgao_nome: str | None = None,
     limit: Annotated[int, Query(ge=1, le=100)] = 20,
     offset: Annotated[int, Query(ge=0)] = 0,
 ):
     items, total = service.list(
         tipo=tipo,
         prioridade=prioridade,
-        orgao_nome=orgao_nome,
         limit=limit,
         offset=offset,
     )

@@ -15,5 +15,4 @@ class DenunciaModel(TypedDict):
     prioridade: PrioridadeEnum
     status: StatusDenuncia
     endereco: str
-    vinculos: NotRequired[list]
     criado_em: datetime
