@@ -284,8 +284,6 @@ option { background: #fff; color: var(--text); }
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding-top: .55rem;
-  border-top: 1px solid var(--border);
 }
 
 .card-date {
