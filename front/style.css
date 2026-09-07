@@ -2,11 +2,11 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --green:        #1a3d2b;
-  --green-mid:    #2d6a4f;
-  --green-light:  #40916c;
-  --green-pale:   #d8f3dc;
-  --green-tint:   #f0faf2;
+  --green:        #1a56db;
+  --green-mid:    #1d4ed8;
+  --green-light:  #3b82f6;
+  --green-pale:   #dbeafe;
+  --green-tint:   #eff6ff;
 
   --bg:           #ffffff;
   --surface:      #f8f9f8;
@@ -20,7 +20,7 @@
   --danger:       #dc2626;
   --danger-bg:    #fef2f2;
   --warning:      #d97706;
-  --info:         #2563eb;
+  --info:         #0369a1;
   --success:      #16a34a;
 
   --prioridade-baixa:   #16a34a;
@@ -109,16 +109,19 @@ body {
 .toolbar {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: .75rem;
   margin-bottom: 1rem;
 }
 
 .filters {
   display: flex;
+  align-items: center;
   gap: .5rem;
-  flex-wrap: wrap;
-  flex: 1;
+}
+
+.filters .select {
+  width: 180px;
 }
 
 .list-summary {
@@ -141,7 +144,7 @@ body {
 }
 .input:focus, .select:focus {
   border-color: var(--green-light);
-  box-shadow: 0 0 0 3px rgba(64,145,108,.12);
+  box-shadow: 0 0 0 3px rgba(59,130,246,.15);
 }
 .input::placeholder { color: var(--text-muted); }
 .textarea { resize: vertical; min-height: 80px; }
@@ -487,6 +490,7 @@ option { background: #fff; color: var(--text); }
   .main { padding: 1.25rem 1rem 4rem; }
   .toolbar { flex-direction: column; align-items: stretch; }
   .filters { flex-direction: column; }
+  .filters .select { width: 100%; }
   .denuncia-grid { grid-template-columns: 1fr; }
   .form-grid { grid-template-columns: 1fr; }
   .col-2, .col-1 { grid-column: 1 / -1; }
