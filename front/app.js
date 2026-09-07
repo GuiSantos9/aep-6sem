@@ -150,9 +150,9 @@ function buildCard(d) {
       <span class="badge badge-${d.status}">${esc(STATUS_LABEL[d.status] || d.status)}</span>
     </div>
     <p class="card-descricao">${esc(d.descricao)}</p>
-    <p class="card-address">📍 ${esc(addr)}</p>
+    <p class="card-address">${esc(addr)}</p>
     <div class="card-footer">
-      <span class="card-date">📅 ${formatDate(d.criado_em)}</span>
+      <span class="card-date">${formatDate(d.criado_em)}</span>
     </div>
   `;
 
