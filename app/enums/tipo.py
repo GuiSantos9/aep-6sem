@@ -1,8 +1,8 @@
 from enum import Enum
 
 
-class TipoArquiteturaHostil(str, Enum):
-    BANCO_DIVIDO = "BANCO_DIVIDO"
+class TipoEnum(str, Enum):
+    BANCO_DIVIDIDO = "BANCO_DIVIDIDO"
     ESPIGAO_METALICO = "ESPIGAO_METALICO"
     INCLINACAO_DE_SUPERFICIE = "INCLINACAO_DE_SUPERFICIE"
     RETIRADA_DE_ASSENTO = "RETIRADA_DE_ASSENTO"

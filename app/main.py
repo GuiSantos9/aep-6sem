@@ -5,7 +5,7 @@ from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 
 from app.exceptions import BusinessRuleError, ConflictError, NotFoundError
-from app.routers.denuncias import router as denuncias_router
+from app.routers.denuncia import router as denuncia_router
 from db.connection import lifespan
 
 config = dotenv_values(".env")
@@ -51,5 +51,4 @@ def health_check():
     return {"status": "ok", "app": app_name}
 
 
-app.include_router(denuncias_router)
-
+app.include_router(denuncia_router)

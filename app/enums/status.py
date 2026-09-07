@@ -2,9 +2,8 @@ from enum import Enum
 
 
 class StatusDenuncia(str, Enum):
-    REGISTRADA = "REGISTRADA"
-    EM_ANALISE = "EM_ANALISE"
-    ENCAMINHADA = "ENCAMINHADA"
-    EM_ANDAMENTO = "EM_ANDAMENTO"
-    RESOLVIDA = "RESOLVIDA"
-    ARQUIVADA = "ARQUIVADA"
+    REGISTRADA = "registrada"
+    EM_ANALISE = "em_analise"
+    ENCAMINHADA = "encaminhada"
+    RESOLVIDA = "resolvida"
+    ARQUIVADA = "arquivada"

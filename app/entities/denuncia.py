@@ -3,24 +3,17 @@ from typing import NotRequired, TypedDict
 
 from bson import ObjectId
 
+from app.enums.prioridade import PrioridadeEnum
+from app.enums.status import StatusDenuncia
+from app.enums.tipo import TipoEnum
+
 
 class DenunciaModel(TypedDict):
     _id: NotRequired[ObjectId]
-    titulo: str
     descricao: str
-    tipo: str
-    prioridade: str
-    status: str
-    logradouro: str
-    numero: str | None
-    complemento: str | None
-    bairro: str
-    cidade: str
-    uf: str
-    cep: str | None
-    latitude: float | None
-    longitude: float | None
-    evidencias: list[str]
+    tipo: TipoEnum
+    prioridade: PrioridadeEnum
+    status: StatusDenuncia
+    endereco: str
+    vinculos: NotRequired[list]
     criado_em: datetime
-    atualizado_em: datetime
-
