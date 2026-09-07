@@ -4,6 +4,8 @@ from dotenv import dotenv_values
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 
+from fastapi.middleware.cors import CORSMiddleware
+
 from app.exceptions import BusinessRuleError, ConflictError, NotFoundError
 from app.routers.denuncia import router as denuncia_router
 from db.connection import lifespan
@@ -19,6 +21,14 @@ app = FastAPI(
     ),
     version="0.1.0",
     lifespan=lifespan,
+)
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
