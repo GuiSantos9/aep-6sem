@@ -196,17 +196,20 @@ option { background: #fff; color: var(--text); }
 }
 .btn-danger:hover:not(:disabled) { background: #b91c1c; }
 
-/* ── Icon buttons (edit / delete) ────────────────────── */
+/* ── Icon buttons ────────────────────────────────────── */
 .btn-icon {
   padding: .3rem;
   border-radius: var(--radius);
   border: none;
   cursor: pointer;
   background: transparent;
-  color: #c0c0c0;
+  color: #b0b0b0;
   font-size: .95rem;
   transition: color var(--transition);
   line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .btn-icon:hover { background: transparent; color: var(--primary); }
 
@@ -400,18 +403,6 @@ option { background: #fff; color: var(--text); }
 }
 .modal-header h2 { font-size: 1rem; font-weight: 700; color: var(--text); }
 
-.modal-close {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  font-size: 1rem;
-  cursor: pointer;
-  padding: .2rem .35rem;
-  border-radius: var(--radius);
-  transition: background var(--transition);
-  line-height: 1;
-}
-.modal-close:hover { background: var(--bg); }
 
 .modal-body {
   padding: 1.2rem 1.3rem;

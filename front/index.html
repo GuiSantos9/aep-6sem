@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Inóspita — Denúncias</title>
+  <title>Inóspita — Seu App de Denúncias</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
   <!-- ── HEADER ── -->
@@ -44,7 +46,7 @@
           <option value="alta">Alta</option>
           <option value="urgente">Urgente</option>
         </select>
-        <button id="btn-buscar" class="btn btn-secondary">🔍 Buscar</button>
+        <button id="btn-buscar" class="btn btn-secondary"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Buscar</button>
       </div>
       <button id="btn-nova" class="btn btn-primary">+ Nova Denúncia</button>
     </div>
@@ -77,7 +79,7 @@
     <div class="modal">
       <div class="modal-header">
         <h2 id="modal-title">Nova Denúncia</h2>
-        <button id="modal-close" class="modal-close" aria-label="Fechar">✕</button>
+        <button id="modal-close" class="btn-icon" aria-label="Fechar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
 
       <form id="denuncia-form" novalidate>
@@ -87,9 +89,8 @@
             <!-- título -->
             <div class="form-group col-full">
               <label for="f-titulo">Título *</label>
-              <input id="f-titulo" type="text" name="titulo" class="input"
-                     minlength="5" maxlength="120" required
-                     placeholder="Ex.: Banco com divisória no centro">
+              <input id="f-titulo" type="text" name="titulo" class="input" minlength="5" maxlength="120" required
+                placeholder="Ex.: Banco com divisória no centro">
             </div>
 
             <!-- tipo + prioridade -->
@@ -132,27 +133,25 @@
             <!-- descrição -->
             <div class="form-group col-full">
               <label for="f-descricao">Descrição *</label>
-              <textarea id="f-descricao" name="descricao" class="input textarea"
-                        minlength="10" maxlength="5000" rows="4" required
-                        placeholder="Descreva a ocorrência em detalhes..."></textarea>
+              <textarea id="f-descricao" name="descricao" class="input textarea" minlength="10" maxlength="5000"
+                rows="4" required placeholder="Descreva a ocorrência em detalhes..."></textarea>
             </div>
 
             <!-- endereço -->
             <div class="form-group col-2">
               <label for="f-logradouro">Logradouro *</label>
-              <input id="f-logradouro" type="text" name="logradouro" class="input"
-                     required placeholder="Rua, Av., Praça...">
+              <input id="f-logradouro" type="text" name="logradouro" class="input" required
+                placeholder="Rua, Av., Praça...">
             </div>
             <div class="form-group col-1">
               <label for="f-numero">Número</label>
-              <input id="f-numero" type="text" name="numero" class="input"
-                     maxlength="20" placeholder="s/n">
+              <input id="f-numero" type="text" name="numero" class="input" maxlength="20" placeholder="s/n">
             </div>
 
             <div class="form-group col-full">
               <label for="f-complemento">Complemento</label>
-              <input id="f-complemento" type="text" name="complemento" class="input"
-                     maxlength="100" placeholder="Bloco, Lote...">
+              <input id="f-complemento" type="text" name="complemento" class="input" maxlength="100"
+                placeholder="Bloco, Lote...">
             </div>
 
             <div class="form-group">
@@ -165,20 +164,18 @@
             </div>
             <div class="form-group col-1">
               <label for="f-uf">UF *</label>
-              <input id="f-uf" type="text" name="uf" class="input"
-                     maxlength="2" required placeholder="PR">
+              <input id="f-uf" type="text" name="uf" class="input" maxlength="2" required placeholder="PR">
             </div>
             <div class="form-group col-1">
               <label for="f-cep">CEP</label>
-              <input id="f-cep" type="text" name="cep" class="input"
-                     placeholder="00000-000">
+              <input id="f-cep" type="text" name="cep" class="input" placeholder="00000-000">
             </div>
 
             <!-- evidências -->
             <div class="form-group col-full">
               <label for="f-evidencias">Evidências <span class="label-hint">(URLs, uma por linha)</span></label>
               <textarea id="f-evidencias" name="evidencias" class="input textarea" rows="3"
-                        placeholder="https://example.com/foto.jpg"></textarea>
+                placeholder="https://example.com/foto.jpg"></textarea>
             </div>
 
           </div>
@@ -215,4 +212,5 @@
 
   <script src="app.js"></script>
 </body>
+
 </html>
