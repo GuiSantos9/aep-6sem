@@ -32,6 +32,10 @@ def criar_indices(database: Database) -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    if hasattr(app.state, "database"):
+        yield
+        return
+
     mongo_uri = obter_configuracao("MONGO_URI")
     db_name = obter_configuracao("DB_NAME")
 

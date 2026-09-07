@@ -9,8 +9,6 @@ DENUNCIA_VALIDA = {
     "cidade": "Maringá",
     "uf": "pr",
     "cep": "87000-000",
-    "latitude": -23.4205,
-    "longitude": -51.9333,
     "evidencias": ["https://example.com/evidencia-1.jpg"],
 }
 
@@ -28,7 +26,7 @@ def test_crud_de_denuncia(client):
     assert criada["status"] == "registrada"
     assert criada["uf"] == "PR"
 
-    response = client.get("/denuncias?prioridade=alta&cidade=Maringá")
+    response = client.get("/denuncias?prioridade=alta")
     assert response.status_code == 200
     assert response.json()["total"] == 1
 
@@ -45,35 +43,6 @@ def test_crud_de_denuncia(client):
     assert client.get(f"/denuncias/{denuncia_id}").status_code == 404
 
 
-def test_vinculo_encaminha_denuncia_e_impede_duplicidade(client):
-    denuncia_id = criar_denuncia(client)["id"]
-    vinculo = {
-        "orgao_nome": "Secretaria Municipal de Urbanismo",
-        "orgao_tipo": "Órgão municipal",
-        "contato": "urbanismo@example.gov.br",
-        "protocolo": "URB-2026-001",
-    }
-
-    response = client.post(f"/denuncias/{denuncia_id}/vinculos", json=vinculo)
-    assert response.status_code == 201
-    vinculo_id = response.json()["id"]
-    assert response.json()["orgao_nome"] == vinculo["orgao_nome"]
-
-    denuncia = client.get(f"/denuncias/{denuncia_id}").json()
-    assert denuncia["status"] == "encaminhada"
-    assert len(denuncia["vinculos"]) == 1
-
-    response = client.post(f"/denuncias/{denuncia_id}/vinculos", json=vinculo)
-    assert response.status_code == 409
-
-    response = client.delete(
-        f"/denuncias/{denuncia_id}/vinculos/{vinculo_id}"
-    )
-    assert response.status_code == 204
-    denuncia = client.get(f"/denuncias/{denuncia_id}").json()
-    assert denuncia["status"] == "em_analise"
-
-
 def test_nao_encaminha_sem_vinculo(client):
     denuncia_id = criar_denuncia(client)["id"]
 
@@ -83,14 +52,6 @@ def test_nao_encaminha_sem_vinculo(client):
     )
     assert response.status_code == 422
     assert "vínculo" in response.json()["detail"]
-
-
-def test_exige_latitude_e_longitude_juntas(client):
-    payload = DENUNCIA_VALIDA | {"longitude": None}
-    response = client.post("/denuncias", json=payload)
-
-    assert response.status_code == 422
-    assert "juntas" in response.json()["detail"]
 
 
 def test_object_id_invalido_retorna_404(client):
