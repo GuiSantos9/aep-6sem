@@ -36,7 +36,6 @@ python -m pytest --cov=app --cov=db --cov-branch --cov-report=term-missing --cov
 
 ## Evidências para entregar
 
-- `htmlcov/index.html`: abra no navegador; mantenha a pasta inteira para funcionar.
 - `coverage.xml`: resultado de cobertura em formato processável.
 - `reports/pytest.txt`: saída da execução verificada.
 - `reports/junit.xml`: resultado dos 88 casos.
