@@ -12,6 +12,11 @@ O projeto tem três componentes:
 
 **Sequência de inicialização: MongoDB → API → frontend.** Com Docker Compose, o banco e a API são iniciados juntos. O frontend deve ser servido separadamente em ambas as opções abaixo.
 
+## 0. Resultado dos testes
+88 testes aprovados em Python 3.12.14 (Linux). Cobertura de linhas e ramificações combinadas: 99,44%, acima do mínimo de 70%. São 321 de 323 instruções executáveis cobertas (99,38%) e 36 de 36 ramificações cobertas (100%). Os testes originais foram preservados.
+
+A medição abrange todo o backend Python em app/ e db/, sem exclusões de módulos da aplicação. Não mede o JavaScript, HTML ou CSS em front/. Se a rubrica exigir cobertura do frontend, ela deverá ser medida separadamente com ferramentas JavaScript.
+
 ## 1. Preparação
 
 Clone o repositório ou baixe e extraia seu ZIP. Abra um terminal na **raiz do projeto**, a pasta que contém `requirements.txt`, `docker-compose.yaml`, `app/` e `front/`.
