@@ -14,10 +14,11 @@ def client():
 
     app.state.mongodb_client = mongodb_client
     app.state.database = database
-    with TestClient(app) as test_client:
-        yield test_client
-
-    mongodb_client.close()
-    del app.state.mongodb_client
-    del app.state.database
+    try:
+        with TestClient(app) as test_client:
+            yield test_client
+    finally:
+        mongodb_client.close()
+        del app.state.mongodb_client
+        del app.state.database
 
