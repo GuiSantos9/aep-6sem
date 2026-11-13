@@ -9,7 +9,7 @@ from fastapi import FastAPI
 
 from db import connection
 from db.seed import SEED, seed_denuncias
-from app.schemas.denuncia import DenunciaResponse
+from app.schemas.report import DenunciaResponse
 
 
 @pytest.mark.parametrize('environment,config,expected', [

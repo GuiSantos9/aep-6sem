@@ -1,19 +1,30 @@
 from typing import Any
 
-from app.entities.denuncia import DenunciaModel
-from app.enums.prioridade import PrioridadeEnum
+from app.entities.report import DenunciaModel
+from app.enums.priority import PrioridadeEnum
 from app.enums.status import StatusDenuncia
-from app.enums.tipo import TipoEnum
+from app.enums.report_type import TipoEnum
 from app.exceptions import BusinessRuleError, NotFoundError
-from app.repositories.denuncia_repository import DenunciaRepository
-from app.schemas.denuncia import DenunciaCreate, DenunciaUpdate
+from app.repositories.report_repository import DenunciaRepository
+from app.repositories.location_repository import LocalRepository
+from app.schemas.report import DenunciaCreate, DenunciaUpdate
 
 
 class DenunciaService:
-    def __init__(self, repository: DenunciaRepository) -> None:
+    def __init__(
+        self,
+        repository: DenunciaRepository,
+        locais: LocalRepository | None = None,
+    ) -> None:
         self.repository = repository
+        self.locais = locais
+
+    def _validar_local(self, local_id: str | None) -> None:
+        if local_id and self.locais and not self.locais.get_by_id(local_id):
+            raise BusinessRuleError(f"Local {local_id} não existe.")
 
     def create(self, payload: DenunciaCreate) -> DenunciaModel:
+        self._validar_local(payload.local_id)
         data = payload.model_dump(mode="json")
         data["status"] = StatusDenuncia.REGISTRADA
         return self.repository.create(data)
@@ -29,12 +40,14 @@ class DenunciaService:
         *,
         tipo: TipoEnum | None,
         prioridade: PrioridadeEnum | None,
+        local_id: str | None = None,
         limit: int,
         offset: int,
     ) -> tuple[list[DenunciaModel], int]:
         return self.repository.list(
             tipo=tipo,
             prioridade=prioridade,
+            local_id=local_id,
             limit=limit,
             offset=offset,
         )
@@ -49,8 +62,22 @@ class DenunciaService:
             raise NotFoundError(f"Denúncia {denuncia_id} não encontrada.")
 
         data = payload.model_dump(exclude_unset=True, mode="json")
+        observacao = data.pop("observacao", None)
+        self._validar_local(data.get("local_id"))
 
-        atualizada = self.repository.update(denuncia_id, data)
+        historico = None
+        novo_status = data.get("status")
+        if novo_status and novo_status != denuncia["status"]:
+            historico = {
+                "status_anterior": denuncia["status"],
+                "status_novo": novo_status,
+                "observacao": observacao or "Status atualizado.",
+            }
+
+        if historico:
+            atualizada = self.repository.update(denuncia_id, data, historico)
+        else:
+            atualizada = self.repository.update(denuncia_id, data)
         if not atualizada:
             raise NotFoundError(f"Denúncia {denuncia_id} não encontrada.")
         return atualizada

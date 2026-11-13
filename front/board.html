@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inóspita — Quadro de Tarefas</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      align-items: start;
+    }
+    .column {
+      background: #e2e2e2;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: .8rem;
+      min-height: 320px;
+      transition: background var(--transition), border-color var(--transition);
+    }
+    .column.drag-over { background: var(--primary-pale); border-color: var(--primary-light); }
+    .column-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: .8rem;
+    }
+    .column-title {
+      font-size: .78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--text-mid);
+    }
+    .column-count {
+      font-size: .72rem;
+      font-weight: 700;
+      color: var(--primary);
+      background: var(--primary-tint);
+      padding: .1rem .55rem;
+      border-radius: 999px;
+    }
+    .col-todo    { border-top: 3px solid var(--status-registrada); }
+    .col-doing   { border-top: 3px solid var(--status-em_analise); }
+    .col-done    { border-top: 3px solid var(--status-resolvida); }
+
+    .tasks { display: flex; flex-direction: column; gap: .6rem; min-height: 60px; }
+    .task {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: .7rem .8rem;
+      cursor: grab;
+      display: flex;
+      flex-direction: column;
+      gap: .4rem;
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+    .task:hover { border-color: var(--primary-light); box-shadow: var(--shadow-sm); }
+    .task.dragging { opacity: .45; }
+    .task-top { display: flex; align-items: flex-start; justify-content: space-between; gap: .4rem; }
+    .task-title { font-size: .88rem; font-weight: 600; line-height: 1.35; flex: 1; }
+    .task-desc { font-size: .78rem; color: var(--text-muted); }
+    .task-foot { display: flex; align-items: center; justify-content: space-between; gap: .4rem; }
+    .task-who { font-size: .72rem; color: var(--text-muted); }
+    .task .btn-icon { opacity: 0; }
+    .task:hover .btn-icon { opacity: 1; }
+    .col-done .task-title { text-decoration: line-through; color: var(--text-muted); }
+
+    .badge-tec  { color: var(--primary); background: var(--primary-tint); }
+    .badge-nao  { color: var(--prioridade-media); background: #fef3c7; }
+
+    .add-form { margin-top: .7rem; display: flex; flex-direction: column; gap: .4rem; }
+
+    @media (max-width: 800px) {
+      .board { grid-template-columns: 1fr; }
+      .header-nav { display: none; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="header">
+    <div class="header-brand">
+      <span class="header-icon" aria-hidden="true">🏙️</span>
+      <div>
+        <h1 class="header-title">Inóspita</h1>
+        <p class="header-sub">Arquitetura Hostil Urbana</p>
+      </div>
+    </div>
+    <nav class="header-nav" aria-label="Navegação">
+      <a class="nav-link" href="index.html">Denúncias</a>
+      <a class="nav-link active" href="board.html">Quadro de tarefas</a>
+    </nav>
+  </header>
+
+  <main class="main">
+
+    <div class="toolbar">
+      <div class="filters">
+        <select id="filter-tipo" class="select">
+          <option value="">Todos os tipos</option>
+          <option value="tecnico">Técnico</option>
+          <option value="nao_tecnico">Não técnico</option>
+        </select>
+        <button id="btn-limpar" class="btn btn-secondary">Limpar</button>
+      </div>
+      <button id="btn-reset" class="btn btn-ghost">Restaurar quadro original</button>
+    </div>
+    <p id="summary" class="list-summary"></p>
+
+    <div class="board" id="board">
+      <section class="column col-todo" data-status="todo">
+        <div class="column-head"><h2 class="column-title">A fazer</h2><span class="column-count"></span></div>
+        <div class="tasks"></div>
+      </section>
+      <section class="column col-doing" data-status="doing">
+        <div class="column-head"><h2 class="column-title">Em andamento</h2><span class="column-count"></span></div>
+        <div class="tasks"></div>
+      </section>
+      <section class="column col-done" data-status="done">
+        <div class="column-head"><h2 class="column-title">Concluído</h2><span class="column-count"></span></div>
+        <div class="tasks"></div>
+      </section>
+    </div>
+
+    <form id="add-form" class="modal" style="margin-top:1.5rem; max-width:none" novalidate>
+      <div class="modal-header"><h2>Nova tarefa</h2></div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="form-group col-2">
+            <label for="n-titulo">Título *</label>
+            <input id="n-titulo" class="input" maxlength="120" required placeholder="Ex.: Gravar o vídeo de demonstração">
+          </div>
+          <div class="form-group">
+            <label for="n-tipo">Tipo</label>
+            <select id="n-tipo" class="select">
+              <option value="tecnico">Técnico</option>
+              <option value="nao_tecnico">Não técnico</option>
+            </select>
+          </div>
+          <div class="form-group col-2">
+            <label for="n-desc">Descrição</label>
+            <input id="n-desc" class="input" maxlength="200" placeholder="Opcional">
+          </div>
+          <div class="form-group">
+            <label for="n-resp">Responsável</label>
+            <input id="n-resp" class="input" maxlength="60" placeholder="Nome">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">+ Adicionar ao "A fazer"</button>
+      </div>
+    </form>
+
+  </main>
+
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+  <script>
+    'use strict';
+
+    const STORAGE_KEY = 'inospita-quadro-v1';
+
+    const INICIAL = [
+      // Concluído
+      { t: 'Coleção locais (CRUD)', d: 'POST/GET/DELETE /locais', k: 'tecnico', s: 'done', r: 'Backend' },
+      { t: 'Relacionamento denúncia → local', d: 'local_id validado; 422 se inexistente, 409 ao excluir local em uso', k: 'tecnico', s: 'done', r: 'Backend' },
+      { t: 'Histórico de status (subdocumentos)', d: 'Lista de mudanças dentro de cada denúncia', k: 'tecnico', s: 'done', r: 'Backend' },
+      { t: 'Testes automatizados e cobertura ≥ 70%', d: '95 testes, 99% de cobertura', k: 'tecnico', s: 'done', r: 'Backend' },
+      { t: 'Front exibe locais e histórico', d: 'Aba Locais, filtro por local e linha do tempo', k: 'tecnico', s: 'done', r: 'Frontend' },
+      { t: 'Documentação técnica (README e ENTREGA2)', d: 'Instalação, execução, testes e estrutura do banco', k: 'tecnico', s: 'done', r: 'Documentação' },
+      { t: 'Roteiro da parte não técnica', d: 'Problema, impacto social, solução e metodologia', k: 'nao_tecnico', s: 'done', r: 'Equipe' },
+      // Em andamento
+      { t: 'Publicar o repositório no GitHub', d: 'Commits organizados e versão final identificada', k: 'tecnico', s: 'doing', r: 'Equipe' },
+      { t: 'Ensaiar a apresentação', d: 'Parte técnica e parte não técnica dentro de 5 min', k: 'nao_tecnico', s: 'doing', r: 'Equipe' },
+      // A fazer
+      { t: 'Gravar o vídeo de demonstração (3 a 5 min)', d: 'Evolução, arquitetura, execução, tecnologias, testes e resultados', k: 'nao_tecnico', s: 'todo', r: 'Equipe' },
+      { t: 'Entregar o link do GitHub e do vídeo', d: 'Conferir se o repositório está acessível', k: 'nao_tecnico', s: 'todo', r: 'Equipe' },
+    ];
+
+    const STATUS_BADGE = { tecnico: ['badge-tec', 'Técnico'], nao_tecnico: ['badge-nao', 'Não técnico'] };
+
+    let tasks = load();
+    let filtroTipo = '';
+
+    function load() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch { /* storage indisponível */ }
+      return seed();
+    }
+
+    function seed() {
+      return INICIAL.map((x, i) => ({ id: 'seed-' + i, ...x }));
+    }
+
+    function save() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); } catch { /* ignora */ }
+    }
+
+    function esc(str) {
+      if (str == null) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    let toastTimer;
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.className = 'toast toast-ok';
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.add('hidden'), 2500);
+    }
+
+    function render() {
+      document.querySelectorAll('.column').forEach(col => {
+        const status = col.dataset.status;
+        const lista = tasks.filter(x => x.s === status && (!filtroTipo || x.k === filtroTipo));
+        col.querySelector('.column-count').textContent = lista.length;
+        const box = col.querySelector('.tasks');
+        box.innerHTML = '';
+        lista.forEach(x => box.appendChild(buildTask(x)));
+      });
+      const done = tasks.filter(x => x.s === 'done').length;
+      document.getElementById('summary').textContent =
+        `${done} de ${tasks.length} tarefa${tasks.length !== 1 ? 's' : ''} concluída${done !== 1 ? 's' : ''} (${tasks.length ? Math.round(done / tasks.length * 100) : 0}%). Arraste os cartões entre as colunas.`;
+    }
+
+    function buildTask(x) {
+      const el = document.createElement('article');
+      el.className = 'task';
+      el.draggable = true;
+      el.dataset.id = x.id;
+      const [cls, label] = STATUS_BADGE[x.k] || STATUS_BADGE.tecnico;
+      el.innerHTML = `
+        <div class="task-top">
+          <h3 class="task-title">${esc(x.t)}</h3>
+          <button class="btn-icon" title="Excluir" aria-label="Excluir tarefa"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+        </div>
+        ${x.d ? `<p class="task-desc">${esc(x.d)}</p>` : ''}
+        <div class="task-foot">
+          <span class="badge ${cls}">${label}</span>
+          <span class="task-who">${esc(x.r || '')}</span>
+        </div>`;
+
+      el.addEventListener('dragstart', e => {
+        e.dataTransfer.setData('text/plain', x.id);
+        e.dataTransfer.effectAllowed = 'move';
+        el.classList.add('dragging');
+      });
+      el.addEventListener('dragend', () => el.classList.remove('dragging'));
+      el.querySelector('.btn-icon').addEventListener('click', () => {
+        tasks = tasks.filter(t => t.id !== x.id);
+        save(); render(); showToast('Tarefa excluída.');
+      });
+      return el;
+    }
+
+    document.querySelectorAll('.column').forEach(col => {
+      col.addEventListener('dragover', e => { e.preventDefault(); col.classList.add('drag-over'); });
+      col.addEventListener('dragleave', e => { if (!col.contains(e.relatedTarget)) col.classList.remove('drag-over'); });
+      col.addEventListener('drop', e => {
+        e.preventDefault();
+        col.classList.remove('drag-over');
+        const t = tasks.find(x => x.id === e.dataTransfer.getData('text/plain'));
+        if (!t || t.s === col.dataset.status) return;
+        t.s = col.dataset.status;
+        save(); render();
+      });
+    });
+
+    document.getElementById('add-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const titulo = document.getElementById('n-titulo').value.trim();
+      if (!titulo) { showToast('Informe o título da tarefa.'); return; }
+      tasks.push({
+        id: 'u-' + Date.now(),
+        t: titulo,
+        d: document.getElementById('n-desc').value.trim(),
+        k: document.getElementById('n-tipo').value,
+        s: 'todo',
+        r: document.getElementById('n-resp').value.trim(),
+      });
+      e.target.reset();
+      save(); render(); showToast('Tarefa adicionada.');
+    });
+
+    document.getElementById('filter-tipo').addEventListener('change', e => { filtroTipo = e.target.value; render(); });
+    document.getElementById('btn-limpar').addEventListener('click', () => {
+      filtroTipo = ''; document.getElementById('filter-tipo').value = ''; render();
+    });
+    document.getElementById('btn-reset').addEventListener('click', () => {
+      tasks = seed(); save(); render(); showToast('Quadro restaurado.');
+    });
+
+    render();
+  </script>
+</body>
+
+</html>

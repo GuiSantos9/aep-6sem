@@ -2,6 +2,12 @@ from datetime import datetime, timezone
 
 from pymongo.database import Database
 
+LOCAIS_SEED = [
+    {"nome": "Largo do Rosário", "bairro": "Centro", "cidade": "Maringá", "uf": "PR", "referencia": "Próximo à Catedral"},
+    {"nome": "Avenida Brasil, 1200", "bairro": "Zona 01", "cidade": "Maringá", "uf": "PR", "referencia": "Prédio comercial com marquise"},
+    {"nome": "Praça da Juventude", "bairro": "Zona 07", "cidade": "Maringá", "uf": "PR", "referencia": None},
+]
+
 SEED = [
     {
         "titulo": "Banco com divisória no Largo do Rosário",
@@ -66,7 +72,30 @@ SEED = [
 ]
 
 
+def seed_locais(database: Database) -> None:
+    if database.locais.count_documents({}) == 0:
+        agora = datetime.now(timezone.utc)
+        database.locais.insert_many([{**l, "criado_em": agora} for l in LOCAIS_SEED])
+        print(f"Seed: {len(LOCAIS_SEED)} locais inseridos.")
+
+
 def seed_denuncias(database: Database) -> None:
     if database.denuncias.count_documents({}) == 0:
-        database.denuncias.insert_many(SEED)
+        locais = [database.locais.find_one({"nome": l["nome"]}) for l in LOCAIS_SEED]
+        documentos = []
+        for denuncia, local in zip(SEED, locais):
+            documento = {
+                **denuncia,
+                "local_id": str(local["_id"]) if local else None,
+                "historico": [
+                    {
+                        "status_anterior": None,
+                        "status_novo": "registrada",
+                        "observacao": "Denúncia registrada.",
+                        "data": denuncia["criado_em"],
+                    }
+                ],
+            }
+            documentos.append(documento)
+        database.denuncias.insert_many(documentos)
         print(f"Seed: {len(SEED)} denúncias inseridas.")

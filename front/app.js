@@ -44,6 +44,8 @@ const state = {
   total:      0,
   tipo:       '',
   prioridade: '',
+  local:      '',
+  locais:     [],
   editingId:  null,
   deletingId: null,
 };
@@ -75,6 +77,11 @@ const api = {
   create:    (payload)      => api.request('POST', '/denuncias', payload),
   update:    (id, payload)  => api.request('PATCH', `/denuncias/${id}`, payload),
   delete:    (id)           => api.request('DELETE', `/denuncias/${id}`),
+
+  listLocais:    ()          => api.request('GET', '/locais'),
+  createLocal:   (payload)   => api.request('POST', '/locais', payload),
+  deleteLocal:   (id)        => api.request('DELETE', `/locais/${id}`),
+  denunciasDoLocal: (id)     => api.request('GET', `/locais/${id}/denuncias`),
 };
 
 /* ── Toast ───────────────────────────────────────────── */
@@ -151,8 +158,9 @@ function buildCard(d) {
     </div>
     <p class="card-descricao">${esc(d.descricao)}</p>
     <p class="card-address">${esc(addr)}</p>
+    ${d.local_id ? `<p class="card-address">📍 ${esc(localNome(d.local_id))}</p>` : ''}
     <div class="card-footer">
-      <span class="card-date">${formatDate(d.criado_em)}</span>
+      <span class="card-date">${(d.historico || []).length} registro(s) no histórico · ${formatDate(d.criado_em)}</span>
     </div>
   `;
 
@@ -198,6 +206,7 @@ async function loadList() {
   };
   if (state.tipo)       params.tipo       = state.tipo;
   if (state.prioridade) params.prioridade = state.prioridade;
+  if (state.local)      params.local_id   = state.local;
 
   try {
     const data = await api.list(params);
@@ -216,11 +225,34 @@ function openModal() {
   document.getElementById('f-titulo').focus();
 }
 
+function renderHistorico(historico) {
+  const group = document.getElementById('historico-group');
+  const list  = document.getElementById('historico-list');
+  list.innerHTML = '';
+  if (!historico || historico.length === 0) { group.classList.add('hidden'); return; }
+  historico.slice().reverse().forEach(h => {
+    const li = document.createElement('li');
+    const de = h.status_anterior
+      ? `<span class="badge badge-${h.status_anterior}">${esc(STATUS_LABEL[h.status_anterior])}</span> →`
+      : '';
+    li.innerHTML = `
+      <div class="timeline-status">${de}
+        <span class="badge badge-${h.status_novo}">${esc(STATUS_LABEL[h.status_novo])}</span>
+      </div>
+      <p class="timeline-obs">${esc(h.observacao)}</p>
+      <span class="timeline-date">${new Date(h.data + (h.data.endsWith('Z') ? '' : 'Z')).toLocaleString('pt-BR')}</span>`;
+    list.appendChild(li);
+  });
+  group.classList.remove('hidden');
+}
+
 function closeModal() {
   document.getElementById('modal-overlay').classList.add('hidden');
   document.getElementById('denuncia-form').reset();
   document.getElementById('form-error').classList.add('hidden');
   document.getElementById('status-group').style.display = 'none';
+  document.getElementById('obs-group').style.display = 'none';
+  document.getElementById('historico-group').classList.add('hidden');
   state.editingId = null;
 }
 
@@ -229,6 +261,8 @@ function openCreate() {
   document.getElementById('modal-title').textContent = 'Nova Denúncia';
   document.getElementById('btn-submit').textContent  = 'Criar';
   document.getElementById('status-group').style.display = 'none';
+  document.getElementById('obs-group').style.display = 'none';
+  document.getElementById('historico-group').classList.add('hidden');
   document.getElementById('denuncia-form').reset();
   openModal();
 }
@@ -238,6 +272,7 @@ function openEdit(d) {
   document.getElementById('modal-title').textContent = 'Editar Denúncia';
   document.getElementById('btn-submit').textContent  = 'Salvar';
   document.getElementById('status-group').style.display = '';
+  document.getElementById('obs-group').style.display = '';
 
   const form = document.getElementById('denuncia-form');
   const set  = (name, val) => { if (form.elements[name]) form.elements[name].value = val ?? ''; };
@@ -254,6 +289,8 @@ function openEdit(d) {
   set('cidade',      d.cidade);
   set('uf',          d.uf);
   set('cep',         d.cep);
+  set('local_id',    d.local_id);
+  renderHistorico(d.historico);
 
   if (form.elements['evidencias']) {
     form.elements['evidencias'].value = (d.evidencias || []).join('\n');
@@ -281,9 +318,14 @@ async function handleFormSubmit(e) {
   data.evidencias = evidencias;
 
   // campos opcionais vazios -> omitir
-  ['numero', 'complemento', 'cep'].forEach(k => {
+  ['numero', 'complemento', 'cep', 'observacao'].forEach(k => {
     if (!data[k]) delete data[k];
   });
+  // local: vazio -> omitir na criação, desvincular (null) na edição
+  if (!data.local_id) {
+    if (state.editingId) data.local_id = null; else delete data.local_id;
+  }
+  if (!state.editingId) delete data.observacao;
 
   // em edição: enviar só campos alterados (todos presentes)
   submitBtn.disabled = true;
@@ -317,7 +359,10 @@ function openConfirmDelete(id) {
 
 function closeConfirm() {
   document.getElementById('confirm-overlay').classList.add('hidden');
+  document.getElementById('confirm-text').textContent =
+    'Tem certeza que deseja excluir esta denúncia? A ação não pode ser desfeita.';
   state.deletingId = null;
+  state.deletingLocal = null;
 }
 
 async function handleDelete() {
@@ -325,6 +370,13 @@ async function handleDelete() {
   btn.disabled = true;
   btn.textContent = 'Excluindo...';
   try {
+    if (state.deletingLocal) {
+      await api.deleteLocal(state.deletingLocal);
+      showToast('Local excluído.', 'ok');
+      closeConfirm();
+      loadLocais();
+      return;
+    }
     await api.delete(state.deletingId);
     showToast('Denúncia excluída.', 'ok');
     closeConfirm();
@@ -336,6 +388,128 @@ async function handleDelete() {
     btn.disabled = false;
     btn.textContent = 'Excluir';
   }
+}
+
+/* ── Locais ──────────────────────────────────────────── */
+function localNome(id) {
+  const l = state.locais.find(x => x.id === id);
+  return l ? l.nome : 'Local removido';
+}
+
+function fillLocalSelects() {
+  const opts = state.locais.map(l => `<option value="${l.id}">${esc(l.nome)}</option>`).join('');
+  const filtro = document.getElementById('filter-local');
+  const form   = document.getElementById('f-local');
+  const f = filtro.value, v = form.value;
+  filtro.innerHTML = '<option value="">Todos os locais</option>' + opts;
+  form.innerHTML   = '<option value="">Sem local vinculado</option>' + opts;
+  filtro.value = f;
+  form.value   = v;
+}
+
+async function loadLocais() {
+  try {
+    const data = await api.listLocais();
+    state.locais = data.items;
+    fillLocalSelects();
+    renderLocais();
+  } catch (err) {
+    showToast('Erro ao carregar locais: ' + err.message, 'error');
+  }
+}
+
+function renderLocais() {
+  const grid  = document.getElementById('local-grid');
+  const empty = document.getElementById('locais-empty');
+  const sum   = document.getElementById('locais-summary');
+  grid.innerHTML = '';
+  empty.classList.toggle('hidden', state.locais.length > 0);
+  const n = state.locais.length;
+  sum.textContent = n ? `${n} local${n !== 1 ? 'is' : ''} cadastrado${n !== 1 ? 's' : ''}` : '';
+
+  state.locais.forEach(l => {
+    const card = document.createElement('article');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="card-top">
+        <h3 class="card-title">${esc(l.nome)}</h3>
+        <div class="card-actions">
+          <button class="btn-icon" title="Excluir" data-action="delete"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+        </div>
+      </div>
+      <p class="card-address">${esc([l.bairro, `${l.cidade}/${l.uf}`].join(', '))}</p>
+      ${l.referencia ? `<p class="card-descricao">${esc(l.referencia)}</p>` : ''}
+      <div class="card-footer"><span class="card-date">Clique para ver as denúncias · ${formatDate(l.criado_em)}</span></div>`;
+    card.addEventListener('click', e => {
+      if (e.target.closest('[data-action="delete"]')) { openConfirmDeleteLocal(l.id); return; }
+      openLocalDenuncias(l);
+    });
+    grid.appendChild(card);
+  });
+}
+
+async function openLocalDenuncias(l) {
+  const body = document.getElementById('locdenuncias-body');
+  document.getElementById('locdenuncias-title').textContent = `Denúncias — ${l.nome}`;
+  body.innerHTML = '<p class="list-summary">Carregando...</p>';
+  document.getElementById('locdenuncias-overlay').classList.remove('hidden');
+  try {
+    const data = await api.denunciasDoLocal(l.id);
+    body.innerHTML = data.items.length
+      ? data.items.map(d => `
+          <div class="mini-row">
+            <strong>${esc(d.titulo)}</strong>
+            <div class="card-badges">
+              <span class="badge badge-tipo">${esc(TIPO_LABEL[d.tipo] || d.tipo)}</span>
+              <span class="badge badge-${d.prioridade}">${esc(PRIORIDADE_LABEL[d.prioridade])}</span>
+              <span class="badge badge-${d.status}">${esc(STATUS_LABEL[d.status])}</span>
+            </div>
+          </div>`).join('')
+      : '<p class="list-summary">Nenhuma denúncia vinculada a este local.</p>';
+  } catch (err) {
+    body.innerHTML = `<p class="form-error">${esc(err.message)}</p>`;
+  }
+}
+
+function openLocalModal()  {
+  document.getElementById('local-overlay').classList.remove('hidden');
+  document.getElementById('l-nome').focus();
+}
+function closeLocalModal() {
+  document.getElementById('local-overlay').classList.add('hidden');
+  document.getElementById('local-form').reset();
+  document.getElementById('local-error').classList.add('hidden');
+}
+
+async function handleLocalSubmit(e) {
+  e.preventDefault();
+  const errEl = document.getElementById('local-error');
+  errEl.classList.add('hidden');
+  const data = Object.fromEntries(new FormData(e.target).entries());
+  if (!data.referencia) delete data.referencia;
+  try {
+    await api.createLocal(data);
+    showToast('Local criado com sucesso!', 'ok');
+    closeLocalModal();
+    loadLocais();
+  } catch (err) {
+    errEl.textContent = err.message;
+    errEl.classList.remove('hidden');
+  }
+}
+
+function openConfirmDeleteLocal(id) {
+  state.deletingLocal = id;
+  document.getElementById('confirm-text').textContent =
+    'Tem certeza que deseja excluir este local? Locais com denúncias vinculadas não podem ser excluídos.';
+  document.getElementById('confirm-overlay').classList.remove('hidden');
+}
+
+function switchView(view) {
+  ['denuncias', 'locais'].forEach(v => {
+    document.getElementById(`view-${v}`).classList.toggle('hidden', v !== view);
+    document.getElementById(`tab-${v}`).classList.toggle('active', v === view);
+  });
 }
 
 /* ── Escape HTML ─────────────────────────────────────── */
@@ -357,17 +531,20 @@ document.getElementById('denuncia-form').addEventListener('submit', handleFormSu
 document.getElementById('btn-limpar').addEventListener('click', () => {
   document.getElementById('filter-tipo').value = '';
   document.getElementById('filter-prioridade').value = '';
+  document.getElementById('filter-local').value = '';
   state.tipo       = '';
   state.prioridade = '';
+  state.local      = '';
   state.page = 0;
   loadList();
 });
 
 // buscar ao pressionar Enter nos filtros
-['filter-tipo', 'filter-prioridade'].forEach(id => {
+['filter-tipo', 'filter-prioridade', 'filter-local'].forEach(id => {
   document.getElementById(id).addEventListener('change', () => {
     state.tipo       = document.getElementById('filter-tipo').value;
     state.prioridade = document.getElementById('filter-prioridade').value;
+    state.local      = document.getElementById('filter-local').value;
     state.page = 0;
     loadList();
   });
@@ -384,13 +561,31 @@ document.getElementById('confirm-overlay').addEventListener('click', e => {
   if (e.target === e.currentTarget) closeConfirm();
 });
 
+document.getElementById('btn-novo-local').addEventListener('click', openLocalModal);
+document.getElementById('local-cancel').addEventListener('click', closeLocalModal);
+document.getElementById('local-close').addEventListener('click', closeLocalModal);
+document.getElementById('local-form').addEventListener('submit', handleLocalSubmit);
+document.getElementById('locdenuncias-close').addEventListener('click',
+  () => document.getElementById('locdenuncias-overlay').classList.add('hidden'));
+['local-overlay', 'locdenuncias-overlay'].forEach(id => {
+  document.getElementById(id).addEventListener('click', e => {
+    if (e.target === e.currentTarget) e.currentTarget.classList.add('hidden');
+  });
+});
+document.querySelectorAll('.tab').forEach(t =>
+  t.addEventListener('click', () => switchView(t.dataset.view)));
+
 // fechar com Escape
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
+  for (const id of ['local-overlay', 'locdenuncias-overlay']) {
+    const el = document.getElementById(id);
+    if (!el.classList.contains('hidden')) { el.classList.add('hidden'); return; }
+  }
   if (!document.getElementById('confirm-overlay').classList.contains('hidden')) { closeConfirm(); return; }
   if (!document.getElementById('modal-overlay').classList.contains('hidden'))   { closeModal();   return; }
 });
 
 /* ── Init ────────────────────────────────────────────── */
 checkHealth();
-loadList();
+loadLocais().then(loadList);

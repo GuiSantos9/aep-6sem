@@ -7,7 +7,8 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.exceptions import BusinessRuleError, ConflictError, NotFoundError
-from app.routers.denuncia import router as denuncia_router
+from app.routers.reports import router as denuncia_router
+from app.routers.locations import router as local_router
 from db.connection import lifespan
 
 config = dotenv_values(".env")
@@ -19,7 +20,7 @@ app = FastAPI(
         "API para registrar, consultar e acompanhar denúncias de "
         "arquitetura hostil em espaços urbanos."
     ),
-    version="0.1.0",
+    version="0.2.0",
     lifespan=lifespan,
 )
 
@@ -62,3 +63,4 @@ def health_check():
 
 
 app.include_router(denuncia_router)
+app.include_router(local_router)

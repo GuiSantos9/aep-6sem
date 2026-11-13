@@ -5,9 +5,9 @@ from bson import ObjectId
 from pymongo import DESCENDING
 from pymongo.database import Database
 
-from app.entities.denuncia import DenunciaModel
-from app.enums.prioridade import PrioridadeEnum
-from app.enums.tipo import TipoEnum
+from app.entities.report import DenunciaModel
+from app.enums.priority import PrioridadeEnum
+from app.enums.report_type import TipoEnum
 
 
 def converter_object_id(value: str) -> ObjectId | None:
@@ -26,6 +26,14 @@ class DenunciaRepository:
         document: DenunciaModel = {
             **data,
             "criado_em": agora,
+            "historico": [
+                {
+                    "status_anterior": None,
+                    "status_novo": data["status"],
+                    "observacao": "Denúncia registrada.",
+                    "data": agora,
+                }
+            ],
         }
         result = self.collection.insert_one(document)
         return self.collection.find_one({"_id": result.inserted_id})
@@ -41,6 +49,7 @@ class DenunciaRepository:
         *,
         tipo: TipoEnum | None = None,
         prioridade: PrioridadeEnum | None = None,
+        local_id: str | None = None,
         limit: int = 20,
         offset: int = 0,
     ) -> tuple[list[DenunciaModel], int]:
@@ -50,6 +59,8 @@ class DenunciaRepository:
             query["tipo"] = tipo.value
         if prioridade:
             query["prioridade"] = prioridade.value
+        if local_id:
+            query["local_id"] = local_id
 
         total = self.collection.count_documents(query)
         cursor = (
@@ -64,13 +75,18 @@ class DenunciaRepository:
         self,
         denuncia_id: str,
         data: dict[str, Any],
+        historico: dict[str, Any] | None = None,
     ) -> DenunciaModel | None:
         object_id = converter_object_id(denuncia_id)
         if not object_id:
             return None
 
-        data["atualizado_em"] = datetime.now(timezone.utc)
-        self.collection.update_one({"_id": object_id}, {"$set": data})
+        agora = datetime.now(timezone.utc)
+        data["atualizado_em"] = agora
+        operacao: dict[str, Any] = {"$set": data}
+        if historico:
+            operacao["$push"] = {"historico": {**historico, "data": agora}}
+        self.collection.update_one({"_id": object_id}, operacao)
         return self.collection.find_one({"_id": object_id})
 
     def delete(self, denuncia_id: str) -> bool:

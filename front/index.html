@@ -19,11 +19,22 @@
         <p class="header-sub">Arquitetura Hostil Urbana</p>
       </div>
     </div>
+    <nav class="header-nav" aria-label="Navegação">
+      <a class="nav-link active" href="index.html">Denúncias</a>
+      <a class="nav-link" href="board.html">Quadro de tarefas</a>
+    </nav>
     <div id="health-badge" class="health-badge health-checking">⬤ verificando...</div>
   </header>
 
   <!-- ── MAIN ── -->
   <main class="main">
+
+    <div class="tabs" role="tablist">
+      <button class="tab active" id="tab-denuncias" role="tab" data-view="denuncias">Denúncias</button>
+      <button class="tab" id="tab-locais" role="tab" data-view="locais">Locais</button>
+    </div>
+
+    <section id="view-denuncias">
 
     <!-- toolbar -->
     <div class="toolbar">
@@ -45,6 +56,9 @@
           <option value="media">Média</option>
           <option value="alta">Alta</option>
           <option value="urgente">Urgente</option>
+        </select>
+        <select id="filter-local" class="select">
+          <option value="">Todos os locais</option>
         </select>
         <button id="btn-limpar" class="btn btn-secondary"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Limpar</button>
       </div>
@@ -71,6 +85,21 @@
 
     <!-- pagination -->
     <nav id="pagination" class="pagination hidden" aria-label="Paginação"></nav>
+
+    </section>
+
+    <!-- ── VIEW LOCAIS ── -->
+    <section id="view-locais" class="hidden">
+      <div class="toolbar">
+        <p id="locais-summary" class="list-summary"></p>
+        <button id="btn-novo-local" class="btn btn-primary">+ Novo Local</button>
+      </div>
+      <div id="local-grid" class="denuncia-grid"></div>
+      <div id="locais-empty" class="empty-state hidden">
+        <span>📍</span>
+        <p>Nenhum local cadastrado.</p>
+      </div>
+    </section>
 
   </main>
 
@@ -118,6 +147,14 @@
               </select>
             </div>
 
+            <!-- local (relacionamento com a coleção locais) -->
+            <div class="form-group col-full">
+              <label for="f-local">Local <span class="label-hint">(opcional)</span></label>
+              <select id="f-local" name="local_id" class="select">
+                <option value="">Sem local vinculado</option>
+              </select>
+            </div>
+
             <!-- status (só no modo edição) -->
             <div class="form-group" id="status-group" style="display:none">
               <label for="f-status">Status</label>
@@ -128,6 +165,11 @@
                 <option value="resolvida">Resolvida</option>
                 <option value="arquivada">Arquivada</option>
               </select>
+            </div>
+            <div class="form-group col-2" id="obs-group" style="display:none">
+              <label for="f-observacao">Observação do status <span class="label-hint">(vai para o histórico)</span></label>
+              <input id="f-observacao" type="text" name="observacao" class="input" maxlength="300"
+                placeholder="Ex.: Encaminhada à secretaria de obras">
             </div>
 
             <!-- descrição -->
@@ -180,6 +222,11 @@
 
           </div>
 
+          <div id="historico-group" class="historico hidden">
+            <h3 class="historico-title">Histórico de status</h3>
+            <ol id="historico-list" class="timeline"></ol>
+          </div>
+
           <p id="form-error" class="form-error hidden"></p>
         </div>
 
@@ -191,6 +238,58 @@
     </div>
   </div>
 
+  <!-- ── MODAL LOCAL ── -->
+  <div id="local-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal modal-md">
+      <div class="modal-header">
+        <h2>Novo Local</h2>
+        <button id="local-close" class="btn-icon" aria-label="Fechar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+      <form id="local-form" novalidate>
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="form-group col-full">
+              <label for="l-nome">Nome *</label>
+              <input id="l-nome" name="nome" class="input" minlength="3" maxlength="120" required placeholder="Ex.: Praça da Juventude">
+            </div>
+            <div class="form-group col-2">
+              <label for="l-bairro">Bairro *</label>
+              <input id="l-bairro" name="bairro" class="input" required>
+            </div>
+            <div class="form-group col-1">
+              <label for="l-uf">UF *</label>
+              <input id="l-uf" name="uf" class="input" maxlength="2" required placeholder="PR">
+            </div>
+            <div class="form-group col-full">
+              <label for="l-cidade">Cidade *</label>
+              <input id="l-cidade" name="cidade" class="input" required>
+            </div>
+            <div class="form-group col-full">
+              <label for="l-referencia">Referência</label>
+              <input id="l-referencia" name="referencia" class="input" maxlength="200" placeholder="Ponto de referência">
+            </div>
+          </div>
+          <p id="local-error" class="form-error hidden"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="local-cancel" class="btn btn-ghost">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Criar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── MODAL DENÚNCIAS DO LOCAL ── -->
+  <div id="locdenuncias-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal modal-md">
+      <div class="modal-header">
+        <h2 id="locdenuncias-title">Denúncias do local</h2>
+        <button id="locdenuncias-close" class="btn-icon" aria-label="Fechar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+      <div class="modal-body" id="locdenuncias-body"></div>
+    </div>
+  </div>
+
   <!-- ── MODAL CONFIRMAÇÃO EXCLUSÃO ── -->
   <div id="confirm-overlay" class="modal-overlay hidden" role="alertdialog" aria-modal="true">
     <div class="modal modal-sm">
@@ -198,7 +297,7 @@
         <h2>Confirmar exclusão</h2>
       </div>
       <div class="modal-body">
-        <p>Tem certeza que deseja excluir esta denúncia? A ação não pode ser desfeita.</p>
+        <p id="confirm-text">Tem certeza que deseja excluir esta denúncia? A ação não pode ser desfeita.</p>
       </div>
       <div class="modal-footer">
         <button id="confirm-cancel" class="btn btn-ghost">Cancelar</button>

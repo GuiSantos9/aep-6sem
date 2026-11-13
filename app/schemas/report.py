@@ -10,9 +10,9 @@ from pydantic import (
     model_validator,
 )
 
-from app.enums.prioridade import PrioridadeEnum
+from app.enums.priority import PrioridadeEnum
 from app.enums.status import StatusDenuncia
-from app.enums.tipo import TipoEnum
+from app.enums.report_type import TipoEnum
 
 
 class DenunciaBase(BaseModel):
@@ -28,6 +28,7 @@ class DenunciaBase(BaseModel):
     uf: str = Field(min_length=2, max_length=2)
     cep: str | None = Field(default=None, pattern=r"^\d{5}-?\d{3}$")
     evidencias: list[HttpUrl] = Field(default_factory=list, max_length=10)
+    local_id: str | None = Field(default=None, max_length=24)
 
     @field_validator("uf")
     @classmethod
@@ -61,6 +62,8 @@ class DenunciaUpdate(BaseModel):
     uf: str | None = Field(default=None, min_length=2, max_length=2)
     cep: str | None = Field(default=None, pattern=r"^\d{5}-?\d{3}$")
     evidencias: list[HttpUrl] | None = Field(default=None, max_length=10)
+    local_id: str | None = Field(default=None, max_length=24)
+    observacao: str | None = Field(default=None, max_length=300)
 
     @field_validator("uf")
     @classmethod
@@ -106,6 +109,13 @@ class DenunciaUpdate(BaseModel):
         return self
 
 
+class HistoricoResponse(BaseModel):
+    status_anterior: StatusDenuncia | None
+    status_novo: StatusDenuncia
+    observacao: str
+    data: datetime
+
+
 class DenunciaResponse(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
@@ -124,6 +134,8 @@ class DenunciaResponse(BaseModel):
     cep: str | None
     evidencias: list[HttpUrl]
     criado_em: datetime
+    local_id: str | None = None
+    historico: list[HistoricoResponse] = Field(default_factory=list)
 
     @field_validator("id", mode="before")
     @classmethod

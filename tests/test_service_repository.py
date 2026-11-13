@@ -6,9 +6,9 @@ import pytest
 from bson import ObjectId
 
 from app.exceptions import NotFoundError
-from app.repositories.denuncia_repository import DenunciaRepository, converter_object_id
-from app.services.denuncia_service import DenunciaService
-from app.schemas.denuncia import DenunciaUpdate
+from app.repositories.report_repository import DenunciaRepository, converter_object_id
+from app.services.report_service import DenunciaService
+from app.schemas.report import DenunciaUpdate
 
 
 def test_conversao_object_id():

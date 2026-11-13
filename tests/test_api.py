@@ -2,7 +2,7 @@
 from datetime import datetime, timedelta, timezone
 import pytest
 from bson import ObjectId
-from tests.test_denuncias import DENUNCIA_VALIDA, criar_denuncia
+from tests.test_reports import DENUNCIA_VALIDA, criar_denuncia
 
 
 def test_health(client):
